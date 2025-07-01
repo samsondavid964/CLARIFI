@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,7 +112,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
 
       console.log('Sending text to webhook:', textToSend.substring(0, 100) + '...');
 
-      const response = await fetch('https://n8n-edafe.onrender.com/webhook-test/c5f9e025-f3d3-4a6e-87d6-bcc4373fdf7f', {
+      const response = await fetch('https://n8n-edafe.onrender.com/webhook/c5f9e025-f3d3-4a6e-87d6-bcc4373fdf7f', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

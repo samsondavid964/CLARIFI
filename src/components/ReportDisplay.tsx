@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -130,7 +129,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis, originalText }: ReportDi
       console.log('Original text length:', originalText?.length || 0);
       console.log('Analysis report length:', report.length);
 
-      const response = await fetch('https://n8n-edafe.onrender.com/webhook-test/0f83a06b-280c-4437-a84c-0b4cda2a239b', {
+      const response = await fetch('https://n8n-edafe.onrender.com/webhook/0f83a06b-280c-4437-a84c-0b4cda2a239b', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
