@@ -1,10 +1,16 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Home, Download, Share2, Copy, Check } from "lucide-react";
+import { ArrowLeft, Home, Download, Share2, Copy, Check, AlertTriangle, Flag } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import ReactMarkdown from "react-markdown";
+
+interface AnalysisData {
+  summary: string;
+  risks: string[];
+  keyTerms: { [key: string]: string };
+}
 
 interface ReportDisplayProps {
   report: string;
@@ -15,6 +21,21 @@ interface ReportDisplayProps {
 const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+
+  // Parse the JSON report or fall back to plain text
+  let analysisData: AnalysisData | null = null;
+  let isStructuredData = false;
+
+  try {
+    const parsed = JSON.parse(report);
+    if (parsed.summary && parsed.risks && parsed.keyTerms) {
+      analysisData = parsed;
+      isStructuredData = true;
+      console.log('Parsed structured analysis data:', analysisData);
+    }
+  } catch (error) {
+    console.log('Report is not JSON, displaying as plain text');
+  }
 
   const handleCopy = async () => {
     try {
@@ -35,11 +56,11 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
   };
 
   const handleDownload = () => {
-    const blob = new Blob([report], { type: "text/markdown" });
+    const blob = new Blob([report], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "legal-document-analysis.md";
+    a.download = "legal-document-analysis.txt";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -52,12 +73,12 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <motion.header 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-sm border-b border-gray-800 p-6"
+        className="sticky top-0 z-50 bg-black/90 backdrop-blur-sm border-b border-white/10 p-6"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -65,7 +86,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
               variant="ghost" 
               size="sm" 
               onClick={onNewAnalysis}
-              className="text-gray-300 hover:text-white"
+              className="text-gray-300 hover:text-white hover:bg-white/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               New Analysis
@@ -74,7 +95,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
               variant="ghost" 
               size="sm" 
               onClick={onBack}
-              className="text-gray-300 hover:text-white"
+              className="text-gray-300 hover:text-white hover:bg-white/10"
             >
               <Home className="w-4 h-4 mr-2" />
               Home
@@ -85,7 +106,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
                 alt="Clarifi AI" 
                 className="w-8 h-8"
               />
-              <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 Analysis Report
               </span>
             </div>
@@ -96,7 +117,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
               variant="outline"
               size="sm"
               onClick={handleCopy}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-white/20 text-white hover:bg-white/10 bg-transparent"
             >
               {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
               {copied ? "Copied!" : "Copy"}
@@ -105,7 +126,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
               variant="outline"
               size="sm"
               onClick={handleDownload}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-white/20 text-white hover:bg-white/10 bg-transparent"
             >
               <Download className="w-4 h-4 mr-2" />
               Download
@@ -113,7 +134,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
             <Button
               variant="outline"
               size="sm"
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="border-white/20 text-white hover:bg-white/10 bg-transparent"
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share
@@ -131,7 +152,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
         >
           <div className="text-center mb-12">
             <motion.h1 
-              className="text-4xl font-bold mb-4"
+              className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
@@ -148,88 +169,106 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
             </motion.p>
           </div>
 
-          <Card className="bg-gray-800/50 backdrop-blur-sm border-gray-700 overflow-hidden">
-            <motion.div 
-              className="p-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
-              <div className="prose prose-invert prose-pink max-w-none">
-                <ReactMarkdown
-                  components={{
-                    h1: ({ children }) => (
-                      <h1 className="text-3xl font-bold text-white mb-6 border-b border-gray-700 pb-4">
-                        {children}
-                      </h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className="text-2xl font-semibold text-pink-400 mt-8 mb-4">
-                        {children}
-                      </h2>
-                    ),
-                    h3: ({ children }) => (
-                      <h3 className="text-xl font-medium text-gray-200 mt-6 mb-3">
-                        {children}
-                      </h3>
-                    ),
-                    p: ({ children }) => (
-                      <p className="text-gray-300 leading-relaxed mb-4">
-                        {children}
-                      </p>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4 ml-4">
-                        {children}
-                      </ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="list-decimal list-inside text-gray-300 space-y-2 mb-4 ml-4">
-                        {children}
-                      </ol>
-                    ),
-                    li: ({ children }) => (
-                      <li className="text-gray-300 leading-relaxed">
-                        {children}
-                      </li>
-                    ),
-                    strong: ({ children }) => (
-                      <strong className="text-pink-400 font-semibold">
-                        {children}
-                      </strong>
-                    ),
-                    em: ({ children }) => (
-                      <em className="text-gray-200 italic">
-                        {children}
-                      </em>
-                    ),
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-pink-500 pl-4 italic text-gray-300 bg-gray-900/50 py-2 my-4">
-                        {children}
-                      </blockquote>
-                    ),
-                    code: ({ children }) => (
-                      <code className="bg-gray-900 text-pink-400 px-2 py-1 rounded text-sm">
-                        {children}
-                      </code>
-                    ),
-                  }}
-                >
-                  {report}
-                </ReactMarkdown>
-              </div>
-            </motion.div>
-          </Card>
+          {isStructuredData && analysisData ? (
+            <div className="space-y-8">
+              {/* Plain-English Summary */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <Card className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border-purple-500/30 backdrop-blur-sm">
+                  <div className="p-8">
+                    <h2 className="text-2xl font-bold mb-4 text-purple-300 flex items-center">
+                      📋 Plain-English Summary
+                    </h2>
+                    <p className="text-white text-lg leading-relaxed">
+                      {analysisData.summary}
+                    </p>
+                  </div>
+                </Card>
+              </motion.div>
+
+              {/* Red Flags & Risks */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+              >
+                <Card className="bg-gradient-to-br from-red-900/20 to-orange-900/20 border-red-500/30 backdrop-blur-sm">
+                  <div className="p-8">
+                    <h2 className="text-2xl font-bold mb-6 text-red-300 flex items-center">
+                      <AlertTriangle className="w-6 h-6 mr-3" />
+                      Red Flags & Risks
+                    </h2>
+                    <div className="space-y-4">
+                      {analysisData.risks.map((risk, index) => (
+                        <div key={index} className="flex items-start space-x-3">
+                          <Flag className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                          <p className="text-white leading-relaxed">
+                            {risk}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+
+              {/* Key Terms Explained */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.0 }}
+              >
+                <Card className="bg-gradient-to-br from-blue-900/20 to-teal-900/20 border-blue-500/30 backdrop-blur-sm">
+                  <div className="p-8">
+                    <h2 className="text-2xl font-bold mb-6 text-blue-300 flex items-center">
+                      🔑 Key Terms Explained
+                    </h2>
+                    <div className="space-y-6">
+                      {Object.entries(analysisData.keyTerms).map(([term, definition], index) => (
+                        <div key={index} className="border-l-4 border-blue-400 pl-6">
+                          <h3 className="text-xl font-semibold text-blue-300 mb-2">
+                            {term}
+                          </h3>
+                          <p className="text-white leading-relaxed">
+                            {definition}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            </div>
+          ) : (
+            // Fallback for plain text reports
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden">
+              <motion.div 
+                className="p-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <div className="prose prose-invert max-w-none">
+                  <pre className="whitespace-pre-wrap text-white leading-relaxed">
+                    {report}
+                  </pre>
+                </div>
+              </motion.div>
+            </Card>
+          )}
 
           {/* Action Cards */}
           <motion.div 
             className="grid md:grid-cols-2 gap-6 mt-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
+            transition={{ delay: 1.2 }}
           >
-            <Card className="bg-gradient-to-br from-pink-600/10 to-red-600/10 border-pink-500/30 p-6 hover:border-pink-500/50 transition-all duration-300">
-              <h3 className="text-xl font-semibold mb-3 text-pink-400">
+            <Card className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 border-purple-500/30 p-6 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm">
+              <h3 className="text-xl font-semibold mb-3 text-purple-300">
                 Need Another Analysis?
               </h3>
               <p className="text-gray-300 mb-4">
@@ -237,13 +276,13 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
               </p>
               <Button 
                 onClick={onNewAnalysis}
-                className="bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0"
               >
                 Analyze New Document
               </Button>
             </Card>
 
-            <Card className="bg-gradient-to-br from-gray-700/30 to-gray-600/30 border-gray-600 p-6 hover:border-gray-500 transition-all duration-300">
+            <Card className="bg-gradient-to-br from-gray-700/20 to-gray-600/20 border-gray-500/30 p-6 hover:border-gray-400/50 transition-all duration-300 backdrop-blur-sm">
               <h3 className="text-xl font-semibold mb-3 text-gray-200">
                 Questions About This Report?
               </h3>
@@ -252,7 +291,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
               </p>
               <Button 
                 variant="outline"
-                className="border-gray-500 text-gray-300 hover:bg-gray-700"
+                className="border-white/20 text-white hover:bg-white/10 bg-transparent"
               >
                 Contact Support
               </Button>
