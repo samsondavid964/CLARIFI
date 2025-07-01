@@ -106,12 +106,6 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
           </Button>
-          
-          <div className="text-center text-sm text-gray-400">
-            <p>Demo credentials:</p>
-            <p>Email: edafee65@gmail.com</p>
-            <p>Password: QWERTY</p>
-          </div>
         </motion.form>
       </DialogContent>
     </Dialog>

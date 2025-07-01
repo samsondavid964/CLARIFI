@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,10 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import AdvancedLoader from "./AdvancedLoader";
 import ReportDisplay from "./ReportDisplay";
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Set worker source
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 interface DocumentAnalyzerProps {
   onBack: () => void;
@@ -27,6 +32,23 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
     onBack();
     return null;
   }
+
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
+      fullText += pageText + '\n';
+    }
+
+    return fullText;
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -54,28 +76,39 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
     setError(null);
 
     try {
-      const formData = new FormData();
+      let textToSend = '';
       
       if (activeTab === 'paste') {
-        formData.append('text', textContent);
+        textToSend = textContent;
       } else {
-        formData.append('file', file!);
+        // Extract text from PDF
+        textToSend = await extractTextFromPDF(file!);
       }
+
+      console.log('Sending text to webhook:', textToSend.substring(0, 100) + '...');
 
       const response = await fetch('https://n8n-edafe.onrender.com/webhook-test/c5f9e025-f3d3-4a6e-87d6-bcc4373fdf7f', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: textToSend
+        }),
       });
 
+      console.log('Webhook response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to analyze document');
+        throw new Error(`Failed to analyze document: ${response.status}`);
       }
 
       const result = await response.text();
+      console.log('Webhook response:', result);
       setReport(result);
     } catch (err) {
-      setError('Failed to analyze document. Please try again.');
       console.error('Analysis error:', err);
+      setError('Failed to analyze document. Please try again.');
     } finally {
       setIsAnalyzing(false);
     }
