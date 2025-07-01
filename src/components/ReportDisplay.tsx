@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,10 +8,15 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+interface KeyTerm {
+  term: string;
+  explanation: string;
+}
+
 interface AnalysisData {
   summary: string;
   risks: string[];
-  keyTerms: { [key: string]: string };
+  keyTerms: KeyTerm[];
 }
 
 interface ReportDisplayProps {
@@ -33,18 +39,26 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis, originalText }: ReportDi
   const [isAsking, setIsAsking] = useState(false);
   const { toast } = useToast();
 
+  console.log('Raw report received:', report);
+
   // Check if this is an error response
   let isError = false;
   let errorMessage = "";
   
   try {
     const parsed = JSON.parse(report);
+    console.log('Parsed report:', parsed);
     if (parsed.error && parsed.error.includes("not related to a Legal Document")) {
       isError = true;
       errorMessage = parsed.error;
     }
   } catch (error) {
-    // Not JSON, continue with normal processing
+    console.log('Report is not JSON, checking for plain text error');
+    // Check if it's a plain text error message
+    if (report.includes("not related to a Legal Document")) {
+      isError = true;
+      errorMessage = report;
+    }
   }
 
   // Parse the JSON report or fall back to plain text
@@ -57,7 +71,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis, originalText }: ReportDi
       if (parsed.summary && parsed.risks && parsed.keyTerms) {
         analysisData = parsed;
         isStructuredData = true;
-        console.log('Parsed structured analysis data:', analysisData);
+        console.log('Successfully parsed structured analysis data:', analysisData);
       }
     } catch (error) {
       console.log('Report is not JSON, displaying as plain text');
@@ -397,13 +411,13 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis, originalText }: ReportDi
                           🔑 Key Terms Explained
                         </h2>
                         <div className="space-y-6">
-                          {Object.entries(analysisData.keyTerms).map(([term, definition], index) => (
+                          {analysisData.keyTerms.map((item, index) => (
                             <div key={index} className="border-l-4 border-blue-400 pl-6">
                               <h3 className="text-xl font-semibold text-blue-300 mb-2">
-                                {term}
+                                {item.term}
                               </h3>
                               <p className="text-white leading-relaxed">
-                                {definition}
+                                {item.explanation}
                               </p>
                             </div>
                           ))}
