@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,10 +9,10 @@ import ReactMarkdown from "react-markdown";
 interface ReportDisplayProps {
   report: string;
   onBack: () => void;
-  onHome: () => void;
+  onNewAnalysis: () => void;
 }
 
-const ReportDisplay = ({ report, onBack, onHome }: ReportDisplayProps) => {
+const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
@@ -65,7 +64,7 @@ const ReportDisplay = ({ report, onBack, onHome }: ReportDisplayProps) => {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={onBack}
+              onClick={onNewAnalysis}
               className="text-gray-300 hover:text-white"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -74,7 +73,7 @@ const ReportDisplay = ({ report, onBack, onHome }: ReportDisplayProps) => {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={onHome}
+              onClick={onBack}
               className="text-gray-300 hover:text-white"
             >
               <Home className="w-4 h-4 mr-2" />
@@ -237,7 +236,7 @@ const ReportDisplay = ({ report, onBack, onHome }: ReportDisplayProps) => {
                 Analyze another legal document with our AI-powered tool.
               </p>
               <Button 
-                onClick={onBack}
+                onClick={onNewAnalysis}
                 className="bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white"
               >
                 Analyze New Document
