@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +9,11 @@ import AdvancedLoader from "./AdvancedLoader";
 import ReportDisplay from "./ReportDisplay";
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Set worker source
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Set worker source to use a more reliable worker setup
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url
+).toString();
 
 interface DocumentAnalyzerProps {
   onBack: () => void;
@@ -34,20 +36,32 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
   }
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let fullText = '';
+    try {
+      console.log('Starting PDF text extraction...');
+      const arrayBuffer = await file.arrayBuffer();
+      console.log('PDF file loaded, size:', arrayBuffer.byteLength);
+      
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      console.log('PDF document loaded, pages:', pdf.numPages);
+      
+      let fullText = '';
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ');
-      fullText += pageText + '\n';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        console.log(`Processing page ${i}/${pdf.numPages}`);
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+        fullText += pageText + '\n';
+      }
+
+      console.log('PDF text extraction completed, text length:', fullText.length);
+      return fullText;
+    } catch (error) {
+      console.error('PDF extraction error:', error);
+      throw new Error('Failed to extract text from PDF. Please ensure it\'s a valid PDF file.');
     }
-
-    return fullText;
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +69,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
     if (selectedFile && selectedFile.type === 'application/pdf') {
       setFile(selectedFile);
       setError(null);
+      console.log('PDF file selected:', selectedFile.name, 'Size:', selectedFile.size);
     } else {
       setError('Please select a valid PDF file.');
       setFile(null);
@@ -80,9 +95,15 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
       
       if (activeTab === 'paste') {
         textToSend = textContent;
+        console.log('Using pasted text, length:', textToSend.length);
       } else {
         // Extract text from PDF
+        console.log('Extracting text from PDF file...');
         textToSend = await extractTextFromPDF(file!);
+      }
+
+      if (!textToSend.trim()) {
+        throw new Error('No text content found to analyze.');
       }
 
       console.log('Sending text to webhook:', textToSend.substring(0, 100) + '...');
@@ -108,7 +129,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
       setReport(result);
     } catch (err) {
       console.error('Analysis error:', err);
-      setError('Failed to analyze document. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to analyze document. Please try again.');
     } finally {
       setIsAnalyzing(false);
     }
