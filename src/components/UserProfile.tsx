@@ -16,9 +16,9 @@ const UserProfile = () => {
       <Button
         variant="ghost"
         onClick={() => setShowDropdown(!showDropdown)}
-        className="flex items-center space-x-2 text-white hover:bg-gray-800"
+        className="flex items-center space-x-2 text-white hover:bg-white/10"
       >
-        <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
           <User className="w-4 h-4 text-white" />
         </div>
         <span className="hidden md:block">{user.email}</span>
@@ -28,10 +28,10 @@ const UserProfile = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-50"
+          className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-md rounded-lg shadow-lg border border-white/20 z-50"
         >
-          <div className="p-4 border-b border-gray-700">
-            <p className="text-sm text-gray-300">Signed in as</p>
+          <div className="p-4 border-b border-white/10">
+            <p className="text-sm text-gray-400">Signed in as</p>
             <p className="text-sm font-medium text-white truncate">{user.email}</p>
           </div>
           <div className="p-2">

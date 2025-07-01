@@ -158,19 +158,19 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <motion.header 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-6 flex justify-between items-center border-b border-gray-700"
+        className="p-6 flex justify-between items-center border-b border-white/10 bg-black/80 backdrop-blur-sm"
       >
         <div className="flex items-center space-x-4">
           <Button
             onClick={onBack}
             variant="ghost"
             size="sm"
-            className="text-gray-300 hover:text-white"
+            className="text-gray-300 hover:text-white hover:bg-white/10"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -181,7 +181,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
               alt="Clarifi AI" 
               className="w-8 h-8"
             />
-            <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-gradient">
               Document Analyzer
             </span>
           </div>
@@ -192,7 +192,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
             onClick={logout}
             variant="outline"
             size="sm"
-            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+            className="border-gray-500 text-gray-300 hover:bg-gray-800/50 hover:text-white bg-transparent"
           >
             Sign Out
           </Button>
@@ -206,7 +206,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-4xl mx-auto"
         >
-          <h1 className="text-4xl font-bold text-center mb-8">
+          <h1 className="text-4xl font-bold text-center mb-8 text-gradient">
             Analyze Your Legal Document
           </h1>
           <p className="text-xl text-gray-300 text-center mb-12">
@@ -215,14 +215,14 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
 
           {/* Tab Navigation */}
           <div className="flex justify-center mb-8">
-            <div className="bg-gray-800/50 rounded-lg p-1 flex">
+            <div className="glass-effect rounded-lg p-1 flex">
               <Button
                 onClick={() => setActiveTab('paste')}
                 variant={activeTab === 'paste' ? 'default' : 'ghost'}
                 className={`px-6 py-2 rounded-md transition-all ${
                   activeTab === 'paste' 
-                    ? 'bg-gradient-to-r from-pink-600 to-red-600 text-white' 
-                    : 'text-gray-300 hover:text-white'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0' 
+                    : 'text-gray-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <FileText className="w-4 h-4 mr-2" />
@@ -233,8 +233,8 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
                 variant={activeTab === 'upload' ? 'default' : 'ghost'}
                 className={`px-6 py-2 rounded-md transition-all ${
                   activeTab === 'upload' 
-                    ? 'bg-gradient-to-r from-pink-600 to-red-600 text-white' 
-                    : 'text-gray-300 hover:text-white'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0' 
+                    : 'text-gray-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <Upload className="w-4 h-4 mr-2" />
@@ -249,7 +249,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-2xl p-8"
+            className="glass-effect rounded-2xl p-8"
           >
             {activeTab === 'paste' ? (
               <div className="space-y-4">
@@ -261,7 +261,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
                   value={textContent}
                   onChange={(e) => setTextContent(e.target.value)}
                   placeholder="Paste your legal document text here..."
-                  className="w-full h-64 p-4 bg-gray-900/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full h-64 p-4 bg-black/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
             ) : (
@@ -269,7 +269,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
                 <Label htmlFor="pdf-upload" className="text-lg font-medium text-gray-200">
                   Upload PDF Document
                 </Label>
-                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-pink-500/50 transition-colors">
+                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-purple-500/50 transition-colors">
                   <Input
                     ref={fileInputRef}
                     id="pdf-upload"
@@ -281,7 +281,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
                   <Button
                     onClick={() => fileInputRef.current?.click()}
                     variant="outline"
-                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    className="border-gray-500 text-gray-300 hover:bg-gray-700/50 hover:text-white bg-transparent"
                   >
                     <Upload className="w-4 h-4 mr-2" />
                     Choose PDF File
@@ -312,7 +312,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
               <Button
                 onClick={handleSubmit}
                 disabled={isAnalyzing || (activeTab === 'paste' && !textContent.trim()) || (activeTab === 'upload' && !file)}
-                className="bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white px-8 py-3 text-lg font-semibold rounded-full shadow-xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg font-semibold rounded-full shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border-0"
               >
                 <Send className="w-5 h-5 mr-2" />
                 Analyze Document

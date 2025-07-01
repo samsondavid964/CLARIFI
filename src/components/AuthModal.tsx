@@ -36,9 +36,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-gray-900 border-gray-700 text-white">
+      <DialogContent className="sm:max-w-md bg-black/95 backdrop-blur-md border border-white/20 text-white">
         <DialogHeader>
-          <DialogTitle className="text-center text-xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+          <DialogTitle className="text-center text-xl font-bold text-gradient">
             Sign In to Clarifi AI
           </DialogTitle>
         </DialogHeader>
@@ -60,7 +60,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="pl-10 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                className="pl-10 bg-gray-900/50 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500"
                 required
               />
             </div>
@@ -76,7 +76,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="pl-10 pr-10 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                className="pl-10 pr-10 bg-gray-900/50 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500"
                 required
               />
               <button
@@ -102,7 +102,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white font-semibold py-2 rounded-lg transition-all duration-300"
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-2 rounded-lg transition-all duration-300 border-0"
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
           </Button>
