@@ -36,7 +36,7 @@ const Index = () => {
       >
         <div className="flex items-center space-x-3">
           <img 
-            src="/lovable-uploads/03bd9744-0501-4f4b-9eae-0f28d675c05d.png" 
+            src="/lovable-uploads/6521cce5-4e9f-45fc-aa4a-ee2ce41a22ac.png" 
             alt="Clarifi AI" 
             className="w-10 h-10"
           />
@@ -224,7 +224,7 @@ const Index = () => {
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex items-center justify-center mb-4">
             <img 
-              src="/lovable-uploads/03bd9744-0501-4f4b-9eae-0f28d675c05d.png" 
+              src="/lovable-uploads/6521cce5-4e9f-45fc-aa4a-ee2ce41a22ac.png" 
               alt="Clarifi AI" 
               className="w-8 h-8 mr-2"
             />
