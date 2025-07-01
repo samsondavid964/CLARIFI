@@ -404,7 +404,7 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis, originalText }: ReportDi
                               <div className="w-4 h-4 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
                             </div>
                             <div className="flex-1">
-                              <p className="text-blue-200 font-medium">AI Answer:</p>
+                              <p className="text-blue-200 font-medium">Clarifi AI:</p>
                               <p className="text-white mt-1 leading-relaxed">{qa.answer}</p>
                               <p className="text-gray-400 text-sm mt-2">
                                 {qa.timestamp.toLocaleTimeString()}

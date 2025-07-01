@@ -94,6 +94,10 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, sans-serif;
@@ -101,12 +105,89 @@ All colors MUST be HSL.
   
   /* Smooth transitions for better UX */
   button, input, textarea, select {
-    @apply transition-all duration-200;
+    @apply transition-all duration-300 ease-in-out;
   }
   
   /* Better focus states */
   button:focus-visible, input:focus-visible, textarea:focus-visible {
     @apply ring-2 ring-primary ring-offset-2 ring-offset-background outline-none;
+  }
+
+  /* Smooth scroll animations */
+  * {
+    scroll-behavior: smooth;
+  }
+
+  /* Enhanced animations for elements */
+  .animate-smooth-fade-in {
+    animation: smoothFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-smooth-slide-up {
+    animation: smoothSlideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-smooth-scale {
+    animation: smoothScale 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes smoothFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes smoothSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes smoothScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Smooth hover effects */
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Smooth page transitions */
+  .page-transition {
+    animation: pageTransition 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes pageTransition {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
@@ -126,5 +207,14 @@ All colors MUST be HSL.
   
   .glass-effect {
     @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+
+  /* Smooth scroll utilities */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+
+  .scroll-smooth {
+    scroll-behavior: smooth;
   }
 }
