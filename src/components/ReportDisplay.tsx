@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Home, Download, Share2, Copy, Check, AlertTriangle, Flag } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Home, Download, Share2, Copy, Check, AlertTriangle, Flag, Send, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,10 +17,20 @@ interface ReportDisplayProps {
   report: string;
   onBack: () => void;
   onNewAnalysis: () => void;
+  originalText?: string;
 }
 
-const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) => {
+interface QAHistory {
+  question: string;
+  answer: string;
+  timestamp: Date;
+}
+
+const ReportDisplay = ({ report, onBack, onNewAnalysis, originalText }: ReportDisplayProps) => {
   const [copied, setCopied] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [qaHistory, setQAHistory] = useState<QAHistory[]>([]);
+  const [isAsking, setIsAsking] = useState(false);
   const { toast } = useToast();
 
   // Parse the JSON report or fall back to plain text
@@ -70,6 +81,70 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
       title: "Download Started",
       description: "Your report is being downloaded",
     });
+  };
+
+  const handleAskQuestion = async () => {
+    if (!question.trim()) {
+      toast({
+        title: "Question Required",
+        description: "Please enter a question before submitting",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAsking(true);
+
+    try {
+      console.log('Sending question to webhook:', question);
+      console.log('Original text length:', originalText?.length || 0);
+      console.log('Analysis report length:', report.length);
+
+      const response = await fetch('https://n8n-edafe.onrender.com/webhook-test/0f83a06b-280c-4437-a84c-0b4cda2a239b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: question,
+          originalText: originalText || '',
+          analysisReport: report
+        }),
+      });
+
+      console.log('Question webhook response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error(`Failed to get answer: ${response.status}`);
+      }
+
+      const answer = await response.text();
+      console.log('Question webhook response:', answer);
+
+      // Add to Q&A history
+      setQAHistory(prev => [...prev, {
+        question: question,
+        answer: answer,
+        timestamp: new Date()
+      }]);
+
+      setQuestion("");
+      
+      toast({
+        title: "Question Answered",
+        description: "Your question has been answered successfully",
+      });
+
+    } catch (error) {
+      console.error('Question error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to get answer. Please try again.',
+        variant: "destructive",
+      });
+    } finally {
+      setIsAsking(false);
+    }
   };
 
   return (
@@ -260,12 +335,97 @@ const ReportDisplay = ({ report, onBack, onNewAnalysis }: ReportDisplayProps) =>
             </Card>
           )}
 
+          {/* Ask a Question Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            className="mt-12"
+          >
+            <Card className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 border-green-500/30 backdrop-blur-sm">
+              <div className="p-8">
+                <h2 className="text-2xl font-bold mb-6 text-green-300 flex items-center">
+                  <MessageCircle className="w-6 h-6 mr-3" />
+                  Ask a Question
+                </h2>
+                <p className="text-gray-300 mb-6">
+                  Have specific questions about this document? Ask our AI assistant for clarification.
+                </p>
+                
+                <div className="space-y-4">
+                  <Textarea
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    placeholder="e.g., How much does it cost to cancel early? Can I have a pet in this apartment?"
+                    className="bg-black/50 border-green-500/30 text-white placeholder-gray-400 focus:border-green-400 focus:ring-green-400/20 min-h-[100px] resize-none"
+                    disabled={isAsking}
+                  />
+                  <Button
+                    onClick={handleAskQuestion}
+                    disabled={isAsking || !question.trim()}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0 disabled:opacity-50"
+                  >
+                    {isAsking ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Getting Answer...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Ask Question
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Q&A History */}
+                {qaHistory.length > 0 && (
+                  <div className="mt-8 space-y-6">
+                    <h3 className="text-xl font-semibold text-green-300 border-b border-green-500/30 pb-2">
+                      Question & Answer History
+                    </h3>
+                    {qaHistory.map((qa, index) => (
+                      <div key={index} className="space-y-3">
+                        <div className="bg-green-500/10 rounded-lg p-4 border-l-4 border-green-400">
+                          <div className="flex items-start space-x-3">
+                            <div className="bg-green-500/20 rounded-full p-2">
+                              <MessageCircle className="w-4 h-4 text-green-300" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-green-200 font-medium">Your Question:</p>
+                              <p className="text-white mt-1">{qa.question}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-blue-500/10 rounded-lg p-4 border-l-4 border-blue-400">
+                          <div className="flex items-start space-x-3">
+                            <div className="bg-blue-500/20 rounded-full p-2">
+                              <div className="w-4 h-4 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-blue-200 font-medium">AI Answer:</p>
+                              <p className="text-white mt-1 leading-relaxed">{qa.answer}</p>
+                              <p className="text-gray-400 text-sm mt-2">
+                                {qa.timestamp.toLocaleTimeString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+
           {/* Action Cards */}
           <motion.div 
             className="grid md:grid-cols-2 gap-6 mt-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
+            transition={{ delay: 1.4 }}
           >
             <Card className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 border-purple-500/30 p-6 hover:border-purple-500/50 transition-all duration-300 backdrop-blur-sm">
               <h3 className="text-xl font-semibold mb-3 text-purple-300">

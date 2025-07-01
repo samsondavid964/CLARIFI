@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import AdvancedLoader from "./AdvancedLoader";
 import ReportDisplay from "./ReportDisplay";
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Set worker source to use a more reliable worker setup
+// Set worker source using import.meta.url for better compatibility
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url
@@ -25,6 +26,7 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [report, setReport] = useState<string | null>(null);
+  const [originalText, setOriginalText] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, logout } = useAuth();
@@ -106,6 +108,9 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
         throw new Error('No text content found to analyze.');
       }
 
+      // Store the original text for the Q&A feature
+      setOriginalText(textToSend);
+
       console.log('Sending text to webhook:', textToSend.substring(0, 100) + '...');
 
       const response = await fetch('https://n8n-edafe.onrender.com/webhook-test/c5f9e025-f3d3-4a6e-87d6-bcc4373fdf7f', {
@@ -143,13 +148,16 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
     return (
       <ReportDisplay
         report={report}
+        originalText={originalText}
         onBack={() => {
           setReport(null);
+          setOriginalText('');
           setTextContent('');
           setFile(null);
         }}
         onNewAnalysis={() => {
           setReport(null);
+          setOriginalText('');
           setTextContent('');
           setFile(null);
         }}
