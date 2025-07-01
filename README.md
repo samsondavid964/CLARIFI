@@ -1,73 +1,142 @@
-# Welcome to your Lovable project
+# Clarifi AI
 
-## Project info
+**AI-Powered Legal Document Analysis**
 
-**URL**: https://lovable.dev/projects/2bb391db-e269-4ddd-814a-6fc44468101d
+Clarifi AI is a modern web application that leverages advanced AI to help users understand and analyze complex legal documents. Upload a PDF or paste text, and receive instant, actionable insights, summaries, and risk highlights—all in a beautiful, user-friendly interface.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **AI-Powered Legal Analysis**: Instantly analyze contracts, agreements, rental documents, terms & conditions, and more.
+- **Multiple Input Methods**: Upload PDF files or paste text directly for analysis.
+- **Comprehensive Reports**: Get summaries, key terms, and risk factors extracted from your documents.
+- **Follow-up Q&A**: Ask questions about your document and get AI-generated answers.
+- **User Authentication**: Simple sign-in flow (mocked for demo purposes).
+- **Modern UI/UX**: Responsive, accessible, and visually appealing design with smooth animations.
+- **Notifications**: Toasts and alerts for user feedback.
+- **404 Handling**: Friendly not-found page for invalid routes.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2bb391db-e269-4ddd-814a-6fc44468101d) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## Demo
 
-**Use your preferred IDE**
+> **Live demo:** _https://clarifi-jyr6.onrender.com_
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Getting Started
 
-Follow these steps:
+### Prerequisites
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- [Node.js](https://nodejs.org/) (v18+ recommended)
+- [npm](https://www.npmjs.com/) (comes with Node.js)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Installation
 
-# Step 3: Install the necessary dependencies.
-npm i
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/samsondavid964/CLARIFI.git
+   cd CLARIFI
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   The app will be available at [http://localhost:8080](http://localhost:8080).
+
+---
+
+## Usage
+
+1. **Sign In**  
+   Use the following credentials (mocked for demo):
+   - Email: `edafee65@gmail.com`
+   - Password: `QWERTY`
+
+2. **Analyze a Document**
+   - Paste text or upload a PDF.
+   - Click "Analyze Document" to receive an AI-generated report.
+
+3. **Ask Questions**
+   - After analysis, use the Q&A feature to ask follow-up questions about your document.
+
+4. **Sign Out**
+   - Use the profile dropdown to sign out.
+
+---
+
+## Tech Stack
+
+- **Frontend:** React, TypeScript, Vite
+- **Styling:** Tailwind CSS, shadcn/ui, Framer Motion
+- **UI Components:** Radix UI, Lucide Icons
+- **PDF Parsing:** pdfjs-dist
+- **State Management:** React Context, React Query
+- **Notifications:** Custom Toasts, Sonner
+- **Form Handling:** React Hook Form
+- **Other:** Class Variance Authority, clsx, tailwind-merge
+
+---
+
+## Project Structure
+
+```
+CLARIFI/
+├── public/                # Static assets (favicon, images, robots.txt)
+├── src/
+│   ├── components/        # UI and feature components
+│   ├── contexts/          # React Contexts (e.g., Auth)
+│   ├── hooks/             # Custom React hooks
+│   ├── lib/               # Utility functions
+│   ├── pages/             # Page components (Index, NotFound)
+│   ├── App.tsx            # App root with routing/providers
+│   ├── main.tsx           # Entry point
+│   └── index.css          # Tailwind and global styles
+├── package.json
+├── tailwind.config.ts
+├── vite.config.ts
+└── README.md
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Environment Variables
 
-**Use GitHub Codespaces**
+- No environment variables are required for the default demo setup.
+- If you wish to use your own AI backend/webhooks, update the URLs in:
+  - `src/components/DocumentAnalyzer.tsx`
+  - `src/components/ReportDisplay.tsx`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## Customization
 
-This project is built with:
+- **Branding:** Update the favicon and images in `public/`.
+- **AI Webhooks:** Change the webhook URLs in the relevant components to connect your own AI backend.
+- **Authentication:** Replace the mock authentication logic in `src/contexts/AuthContext.tsx` with your own provider for production use.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## Contributing
 
-Simply open [Lovable](https://lovable.dev/projects/2bb391db-e269-4ddd-814a-6fc44468101d) and click on Share -> Publish.
+Contributions are welcome! Please open an issue or submit a pull request.
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## License
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+[MIT](LICENSE)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+## Author
+
+**Edafeoghene Egona**  
+[Portfolio](https://egonaedafeoghene.framer.website/)
