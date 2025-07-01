@@ -1,11 +1,10 @@
-
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { ArrowLeft, Upload, FileText, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Upload, FileText, Send } from "lucide-react";
+import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 import AdvancedLoader from "./AdvancedLoader";
 import ReportDisplay from "./ReportDisplay";
 
@@ -14,82 +13,94 @@ interface DocumentAnalyzerProps {
 }
 
 const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
-  const [text, setText] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [report, setReport] = useState("");
-  const [activeTab, setActiveTab] = useState<"text" | "upload">("text");
-  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<'paste' | 'upload'>('paste');
+  const [textContent, setTextContent] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [report, setReport] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user, logout } = useAuth();
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type === "application/pdf") {
-      // In a real implementation, you'd extract text from PDF
-      toast({
-        title: "PDF Upload",
-        description: "PDF processing will be implemented with a PDF parser.",
-      });
+  // Redirect if not authenticated
+  if (!user) {
+    onBack();
+    return null;
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile && selectedFile.type === 'application/pdf') {
+      setFile(selectedFile);
+      setError(null);
     } else {
-      toast({
-        title: "Invalid File",
-        description: "Please upload a PDF file.",
-        variant: "destructive",
-      });
+      setError('Please select a valid PDF file.');
+      setFile(null);
     }
   };
 
-  const handleAnalyze = async () => {
-    if (!text.trim()) {
-      toast({
-        title: "No Content",
-        description: "Please enter some text to analyze.",
-        variant: "destructive",
-      });
+  const handleSubmit = async () => {
+    if (activeTab === 'paste' && !textContent.trim()) {
+      setError('Please enter some text to analyze.');
+      return;
+    }
+    
+    if (activeTab === 'upload' && !file) {
+      setError('Please select a PDF file to upload.');
       return;
     }
 
-    setIsLoading(true);
-    
+    setIsAnalyzing(true);
+    setError(null);
+
     try {
-      const response = await fetch("https://n8n-edafe.onrender.com/webhook-test/c5f9e025-f3d3-4a6e-87d6-bcc4373fdf7f", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          document_text: text,
-          timestamp: new Date().toISOString(),
-        }),
+      const formData = new FormData();
+      
+      if (activeTab === 'paste') {
+        formData.append('text', textContent);
+      } else {
+        formData.append('file', file!);
+      }
+
+      const response = await fetch('https://n8n-edafe.onrender.com/webhook-test/c5f9e025-f3d3-4a6e-87d6-bcc4373fdf7f', {
+        method: 'POST',
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Analysis failed");
+        throw new Error('Failed to analyze document');
       }
 
       const result = await response.text();
       setReport(result);
-      
-      toast({
-        title: "Analysis Complete",
-        description: "Your document has been successfully analyzed!",
-      });
-    } catch (error) {
-      console.error("Error analyzing document:", error);
-      toast({
-        title: "Analysis Failed", 
-        description: "There was an error analyzing your document. Please try again.",
-        variant: "destructive",
-      });
+    } catch (err) {
+      setError('Failed to analyze document. Please try again.');
+      console.error('Analysis error:', err);
     } finally {
-      setIsLoading(false);
+      setIsAnalyzing(false);
     }
   };
 
-  if (isLoading) {
+  if (isAnalyzing) {
     return <AdvancedLoader />;
   }
 
   if (report) {
-    return <ReportDisplay report={report} onBack={() => setReport("")} onHome={onBack} />;
+    return (
+      <ReportDisplay
+        report={report}
+        onBack={() => {
+          setReport(null);
+          setTextContent('');
+          setFile(null);
+        }}
+        onNewAnalysis={() => {
+          setReport(null);
+          setTextContent('');
+          setFile(null);
+        }}
+      />
+    );
   }
 
   return (
@@ -98,17 +109,17 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
       <motion.header 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-6 flex items-center justify-between border-b border-gray-800"
+        className="p-6 flex justify-between items-center border-b border-gray-700"
       >
         <div className="flex items-center space-x-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
             onClick={onBack}
+            variant="ghost"
+            size="sm"
             className="text-gray-300 hover:text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
+            Back
           </Button>
           <div className="flex items-center space-x-3">
             <img 
@@ -121,122 +132,139 @@ const DocumentAnalyzer = ({ onBack }: DocumentAnalyzerProps) => {
             </span>
           </div>
         </div>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-400">Welcome, {user.email}</span>
+          <Button
+            onClick={logout}
+            variant="outline"
+            size="sm"
+            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+          >
+            Sign Out
+          </Button>
+        </div>
       </motion.header>
 
+      {/* Main Content */}
       <div className="container mx-auto px-6 py-12">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           className="max-w-4xl mx-auto"
         >
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Analyze Your Legal Document</h1>
-            <p className="text-gray-300 text-lg">
-              Upload a PDF or paste your document text to get detailed insights and analysis
-            </p>
-          </div>
+          <h1 className="text-4xl font-bold text-center mb-8">
+            Analyze Your Legal Document
+          </h1>
+          <p className="text-xl text-gray-300 text-center mb-12">
+            Upload a PDF file or paste text to get AI-powered insights into legal documents
+          </p>
 
           {/* Tab Navigation */}
           <div className="flex justify-center mb-8">
-            <div className="bg-gray-800 rounded-full p-1 flex">
-              <button
-                onClick={() => setActiveTab("text")}
-                className={`px-6 py-2 rounded-full transition-all duration-300 ${
-                  activeTab === "text" 
-                    ? "bg-gradient-to-r from-pink-600 to-red-600 text-white shadow-lg" 
-                    : "text-gray-400 hover:text-white"
+            <div className="bg-gray-800/50 rounded-lg p-1 flex">
+              <Button
+                onClick={() => setActiveTab('paste')}
+                variant={activeTab === 'paste' ? 'default' : 'ghost'}
+                className={`px-6 py-2 rounded-md transition-all ${
+                  activeTab === 'paste' 
+                    ? 'bg-gradient-to-r from-pink-600 to-red-600 text-white' 
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
-                <FileText className="w-4 h-4 inline mr-2" />
+                <FileText className="w-4 h-4 mr-2" />
                 Paste Text
-              </button>
-              <button
-                onClick={() => setActiveTab("upload")}
-                className={`px-6 py-2 rounded-full transition-all duration-300 ${
-                  activeTab === "upload" 
-                    ? "bg-gradient-to-r from-pink-600 to-red-600 text-white shadow-lg" 
-                    : "text-gray-400 hover:text-white"
+              </Button>
+              <Button
+                onClick={() => setActiveTab('upload')}
+                variant={activeTab === 'upload' ? 'default' : 'ghost'}
+                className={`px-6 py-2 rounded-md transition-all ${
+                  activeTab === 'upload' 
+                    ? 'bg-gradient-to-r from-pink-600 to-red-600 text-white' 
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
-                <Upload className="w-4 h-4 inline mr-2" />
+                <Upload className="w-4 h-4 mr-2" />
                 Upload PDF
-              </button>
+              </Button>
             </div>
           </div>
 
-          <Card className="bg-gray-800/50 backdrop-blur-sm border-gray-700 p-8">
-            <AnimatePresence mode="wait">
-              {activeTab === "text" ? (
-                <motion.div
-                  key="text"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-300">
-                        Document Content
-                      </label>
-                      <Textarea
-                        placeholder="Paste your legal document text here... (Terms & Conditions, Tenancy Agreement, etc.)"
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        className="min-h-[300px] bg-gray-900/50 border-gray-600 text-white placeholder:text-gray-400 resize-none focus:border-pink-500 focus:ring-pink-500"
-                      />
-                    </div>
-                    
-                    <div className="flex justify-center">
-                      <Button
-                        onClick={handleAnalyze}
-                        disabled={!text.trim()}
-                        size="lg"
-                        className="bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white px-12 py-3 text-lg font-semibold rounded-full shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Analyze Document
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="upload"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="space-y-6">
-                    <div className="border-2 border-dashed border-gray-600 rounded-xl p-12 text-center hover:border-pink-500 transition-colors duration-300">
-                      <Upload className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-medium mb-2">Upload PDF Document</h3>
-                      <p className="text-gray-400 mb-6">
-                        Drag and drop your PDF file here, or click to browse
-                      </p>
-                      <input
-                        type="file"
-                        accept=".pdf"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                        id="pdf-upload"
-                      />
-                      <label htmlFor="pdf-upload">
-                        <Button
-                          variant="outline"
-                          className="border-gray-600 text-gray-300 hover:bg-gray-700 cursor-pointer"
-                          asChild
-                        >
-                          <span>Choose PDF File</span>
-                        </Button>
-                      </label>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </Card>
+          {/* Content Area */}
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-2xl p-8"
+          >
+            {activeTab === 'paste' ? (
+              <div className="space-y-4">
+                <Label htmlFor="document-text" className="text-lg font-medium text-gray-200">
+                  Document Text
+                </Label>
+                <textarea
+                  id="document-text"
+                  value={textContent}
+                  onChange={(e) => setTextContent(e.target.value)}
+                  placeholder="Paste your legal document text here..."
+                  className="w-full h-64 p-4 bg-gray-900/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Label htmlFor="pdf-upload" className="text-lg font-medium text-gray-200">
+                  Upload PDF Document
+                </Label>
+                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-pink-500/50 transition-colors">
+                  <Input
+                    ref={fileInputRef}
+                    id="pdf-upload"
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="outline"
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose PDF File
+                  </Button>
+                  {file && (
+                    <p className="mt-2 text-green-400">
+                      Selected: {file.name}
+                    </p>
+                  )}
+                  <p className="mt-2 text-sm text-gray-400">
+                    Only PDF files are supported
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-red-400 text-center mt-4"
+              >
+                {error}
+              </motion.p>
+            )}
+
+            <div className="flex justify-center mt-8">
+              <Button
+                onClick={handleSubmit}
+                disabled={isAnalyzing || (activeTab === 'paste' && !textContent.trim()) || (activeTab === 'upload' && !file)}
+                className="bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white px-8 py-3 text-lg font-semibold rounded-full shadow-xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                <Send className="w-5 h-5 mr-2" />
+                Analyze Document
+              </Button>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>

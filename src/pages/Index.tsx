@@ -1,12 +1,24 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Brain, FileText, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Brain, FileText, Sparkles, Zap, ExternalLink, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 import DocumentAnalyzer from "@/components/DocumentAnalyzer";
+import AuthModal from "@/components/AuthModal";
+import UserProfile from "@/components/UserProfile";
 
 const Index = () => {
   const [showAnalyzer, setShowAnalyzer] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user } = useAuth();
+
+  const handleAnalyzeClick = () => {
+    if (user) {
+      setShowAnalyzer(true);
+    } else {
+      setShowAuthModal(true);
+    }
+  };
 
   if (showAnalyzer) {
     return <DocumentAnalyzer onBack={() => setShowAnalyzer(false)} />;
@@ -31,11 +43,26 @@ const Index = () => {
             Clarifi AI
           </span>
         </div>
-        <nav className="hidden md:flex space-x-8">
-          <a href="#about" className="hover:text-pink-400 transition-colors">About</a>
-          <a href="#features" className="hover:text-pink-400 transition-colors">Features</a>
-          <a href="#developer" className="hover:text-pink-400 transition-colors">Developer</a>
-        </nav>
+        <div className="flex items-center space-x-4">
+          <nav className="hidden md:flex space-x-8">
+            <a href="#about" className="hover:text-pink-400 transition-colors">About</a>
+            <a href="#features" className="hover:text-pink-400 transition-colors">Features</a>
+            <a href="#developer" className="hover:text-pink-400 transition-colors">Developer</a>
+          </nav>
+          {user ? (
+            <UserProfile />
+          ) : (
+            <Button
+              onClick={() => setShowAuthModal(true)}
+              variant="outline"
+              size="sm"
+              className="border-pink-500/50 text-pink-400 hover:bg-pink-500/10"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Sign In
+            </Button>
+          )}
+        </div>
       </motion.header>
 
       {/* Hero Section */}
@@ -72,11 +99,11 @@ const Index = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
-              onClick={() => setShowAnalyzer(true)}
+              onClick={handleAnalyzeClick}
               size="lg" 
               className="bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105"
             >
-              Analyze Document <ArrowRight className="ml-2 w-5 h-5" />
+              {user ? 'Analyze Document' : 'Sign In to Analyze'} <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button 
               variant="outline" 
@@ -173,11 +200,19 @@ const Index = () => {
                 <h3 className="text-3xl font-bold">Edafeoghene Egona</h3>
               </div>
               <p className="text-xl text-pink-400 mb-4">AI Agent Developer & Innovation Architect</p>
-              <p className="text-gray-300 leading-relaxed">
+              <p className="text-gray-300 leading-relaxed mb-6">
                 Passionate about creating intelligent solutions that bridge the gap between 
                 complex technology and user-friendly experiences. Clarifi AI represents the 
                 culmination of advanced AI engineering and thoughtful user experience design.
               </p>
+              <Button
+                asChild
+                className="bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-pink-500/25 transition-all duration-300"
+              >
+                <a href="https://egonaedafeoghene.framer.website/" target="_blank" rel="noopener noreferrer">
+                  View Portfolio <ExternalLink className="ml-2 w-4 h-4" />
+                </a>
+              </Button>
             </div>
           </div>
         </div>
@@ -201,6 +236,8 @@ const Index = () => {
           </p>
         </div>
       </footer>
+
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   );
 };
