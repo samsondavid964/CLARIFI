@@ -145,25 +145,25 @@ All colors MUST be HSL.
   }
 
   .animate-pulse-glow {
-    animation: pulseGlow 3s ease-in-out infinite;
+    animation: pulseGlow 8s ease-in-out infinite;
   }
 
   .animate-rotate-glow {
-    animation: rotateGlow 8s linear infinite;
+    animation: rotateGlow 12s linear infinite;
   }
 
   .animate-text-shimmer {
-    animation: textShimmer 3s ease-in-out infinite;
+    animation: textShimmer 6s ease-in-out infinite;
   }
 
   @keyframes focusPulse {
     0%, 100% { 
-      box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.4);
+      box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.3);
       transform: scale(1.02);
     }
     50% { 
-      box-shadow: 0 0 0 8px rgba(168, 85, 247, 0.2);
-      transform: scale(1.04);
+      box-shadow: 0 0 0 6px rgba(168, 85, 247, 0.15);
+      transform: scale(1.03);
     }
   }
 
@@ -226,23 +226,23 @@ All colors MUST be HSL.
     0%, 100% {
       opacity: 1;
       transform: scale(1);
-      filter: brightness(1) drop-shadow(0 0 20px rgba(168, 85, 247, 0.5));
+      filter: brightness(1) drop-shadow(0 0 15px rgba(168, 85, 247, 0.3));
     }
     50% {
-      opacity: 0.8;
-      transform: scale(1.05);
-      filter: brightness(1.2) drop-shadow(0 0 40px rgba(168, 85, 247, 0.8));
+      opacity: 0.9;
+      transform: scale(1.02);
+      filter: brightness(1.1) drop-shadow(0 0 25px rgba(168, 85, 247, 0.4));
     }
   }
 
   @keyframes rotateGlow {
     from {
       transform: rotate(0deg);
-      filter: hue-rotate(0deg) drop-shadow(0 0 30px rgba(168, 85, 247, 0.6));
+      filter: hue-rotate(0deg) drop-shadow(0 0 20px rgba(168, 85, 247, 0.3));
     }
     to {
       transform: rotate(360deg);
-      filter: hue-rotate(360deg) drop-shadow(0 0 30px rgba(168, 85, 247, 0.6));
+      filter: hue-rotate(360deg) drop-shadow(0 0 20px rgba(168, 85, 247, 0.3));
     }
   }
 
@@ -304,7 +304,7 @@ All colors MUST be HSL.
   .text-gradient {
     @apply bg-gradient-to-r from-purple-400 via-pink-300 to-purple-400 bg-clip-text text-transparent;
     background-size: 200% auto;
-    animation: textShimmer 3s ease-in-out infinite;
+    animation: textShimmer 6s ease-in-out infinite;
   }
   
   .glass-effect {
@@ -328,8 +328,8 @@ All colors MUST be HSL.
   }
 
   .hover-glow:hover {
-    filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6));
-    transform: scale(1.05);
+    filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.4));
+    transform: scale(1.02);
   }
 
   .animate-border-glow {
@@ -342,11 +342,11 @@ All colors MUST be HSL.
     position: absolute;
     inset: 0;
     padding: 2px;
-    background: linear-gradient(45deg, transparent, rgba(168, 85, 247, 0.8), transparent);
+    background: linear-gradient(45deg, transparent, rgba(168, 85, 247, 0.5), transparent);
     border-radius: inherit;
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
-    animation: borderRotate 3s linear infinite;
+    animation: borderRotate 4s linear infinite;
   }
 
   @keyframes gradientShift {

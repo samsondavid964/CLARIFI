@@ -29,20 +29,20 @@ const Index = () => {
     <div className="min-h-screen bg-black text-white overflow-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
+        {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 bg-purple-500/20 rounded-full"
+            className="absolute w-2 h-2 bg-purple-500/15 rounded-full"
             animate={{
               x: [0, Math.random() * window.innerWidth],
               y: [0, Math.random() * window.innerHeight],
               scale: [0, 1, 0],
-              opacity: [0, 0.8, 0],
+              opacity: [0, 0.6, 0],
             }}
             transition={{
-              duration: Math.random() * 10 + 10,
+              duration: Math.random() * 15 + 15,
               repeat: Infinity,
-              delay: Math.random() * 5,
+              delay: Math.random() * 8,
               ease: "easeInOut",
             }}
             style={{
@@ -112,7 +112,7 @@ const Index = () => {
                 onClick={() => setShowAuthModal(true)}
                 variant="outline"
                 size="sm"
-                className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 hover:text-purple-200 bg-transparent animate-border-glow"
+                className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 hover:text-purple-200 bg-transparent"
               >
                 <LogIn className="w-4 h-4 mr-2" />
                 Sign In
@@ -145,9 +145,9 @@ const Index = () => {
           >
             <motion.div
               animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
             >
-              <Sparkles className="w-6 h-6 text-purple-400 mr-2 animate-pulse-glow" />
+              <Sparkles className="w-6 h-6 text-purple-400 mr-2" />
             </motion.div>
             <motion.span 
               className="text-purple-300 font-medium"
@@ -197,7 +197,7 @@ const Index = () => {
               <Button 
                 onClick={handleAnalyzeClick}
                 size="lg" 
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 border-0 animate-pulse-glow"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 border-0"
               >
                 {user ? 'Analyze Document' : 'Sign In to Analyze'} 
                 <motion.div
@@ -259,14 +259,14 @@ const Index = () => {
                   rotateY: 5,
                   rotateX: 5
                 }}
-                className="glass-effect rounded-2xl p-8 hover:border-purple-500/30 transition-all duration-500 hover-ultra-lift animate-border-glow"
+                className="glass-effect rounded-2xl p-8 hover:border-purple-500/30 transition-all duration-500 hover-ultra-lift"
               >
                 <motion.div
                   className="w-12 h-12 text-purple-400 mb-6 animate-floating"
                   whileHover={{ 
                     scale: 1.2, 
                     rotate: 360,
-                    filter: "drop-shadow(0 0 20px rgba(168, 85, 247, 0.8))"
+                    filter: "drop-shadow(0 0 20px rgba(168, 85, 247, 0.6))"
                   }}
                   transition={{ duration: 0.6 }}
                 >
@@ -315,11 +315,11 @@ const Index = () => {
               <motion.div 
                 className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-xl"
                 animate={{ 
-                  scale: [1, 1.2, 1],
+                  scale: [1, 1.1, 1],
                   rotate: [0, 180, 360]
                 }}
                 transition={{ 
-                  duration: 8, 
+                  duration: 12, 
                   repeat: Infinity,
                   ease: "linear"
                 }}
@@ -329,8 +329,8 @@ const Index = () => {
                 alt="Edafeoghene Egona"
                 className="relative w-64 h-64 rounded-full object-cover border-4 border-purple-500/30 animate-floating"
                 whileHover={{ 
-                  borderColor: "rgba(168, 85, 247, 0.8)",
-                  filter: "drop-shadow(0 0 30px rgba(168, 85, 247, 0.6))"
+                  borderColor: "rgba(168, 85, 247, 0.6)",
+                  filter: "drop-shadow(0 0 25px rgba(168, 85, 247, 0.4))"
                 }}
               />
             </motion.div>
@@ -378,7 +378,7 @@ const Index = () => {
               >
                 <Button
                   asChild
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-purple-500/25 transition-all duration-500 border-0 animate-pulse-glow"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-purple-500/25 transition-all duration-500 border-0"
                 >
                   <a href="https://egonaedafeoghene.framer.website/" target="_blank" rel="noopener noreferrer">
                     View Portfolio 
