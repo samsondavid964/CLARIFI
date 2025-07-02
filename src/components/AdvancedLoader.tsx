@@ -43,11 +43,12 @@ const AdvancedLoader = () => {
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
-              <div className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-full border-2 border-pink-500/30 flex items-center justify-center">
+              <div className="relative w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-full border-2 border-pink-500/30 flex items-center justify-center backdrop-blur-sm">
                 <img 
-                  src="/lovable-uploads/03bd9744-0501-4f4b-9eae-0f28d675c05d.png" 
+                  src="/lovable-uploads/6521cce5-4e9f-45fc-aa4a-ee2ce41a22ac.png" 
                   alt="Clarifi AI" 
-                  className="w-16 h-16"
+                  className="w-16 h-16 object-contain"
+                  style={{ filter: 'drop-shadow(0 0 10px rgba(168, 85, 247, 0.3))' }}
                 />
               </div>
             </div>
